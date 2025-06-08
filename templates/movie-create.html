@@ -1,0 +1,91 @@
+  {% extends "base.html" %}
+
+  {% block title %}Suggest Movie{% endblock %}
+
+  {% block content %}
+    
+    <h1 class="text-4xl font-bold mb-8">🎥 Suggest a New Movie</h1>
+
+    <form id="movie-form" class="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-xl space-y-6">
+      <div>
+        <label for="name" class="block mb-1 text-sm font-medium text-gray-300">Movie Name</label>
+        <input type="text" id="name" name="name" placeholder="Name of The Movie" required class="w-full p-3 rounded bg-gray-700 border border-gray-600 text-white"/>
+      </div>
+      
+      <div>
+        <label for="description" class="block mb-1 text-sm font-medium text-gray-300">Description</label>
+        <textarea id="description" name="description" placeholder="Minimum 10 characters" class="w-full p-3 rounded bg-gray-700 border border-gray-600 text-white" rows="4"></textarea>
+      </div>
+
+      <div>
+        <label for="ott" class="block mb-1 text-sm font-medium text-gray-300 ">OTT Platform</label>
+        <input type="text" id="ott" name="ott" placeholder="OTT Platform" class="w-full p-3 rounded bg-gray-700 border border-gray-600 text-white"/>
+      </div>
+
+      <div class="flex justify-center">
+  <button type="submit" id="submit-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded transition hover:[transform:translateY(-.335rem)] hover:shadow-xl">
+    Submit Movie
+  </button>
+</div>
+
+
+  <!-- 
+      <button type="submit" id="submit-btn" class="w-full bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-3 rounded transition">
+        Submit Movie
+      </button> -->
+      <p id="response-msg" class="text-center mt-4 text-sm"></p>
+    </form>
+
+    <div class="mt-6">
+      <a href="/movies-ui" class="text-cyan-400 hover:underline">← Back to Movie List</a>
+    </div>
+  {% endblock %}
+
+  {% block scripts %}
+    <script>
+      document.getElementById('movie-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const submitBtn = document.getElementById('submit-btn');
+        submitBtn.disabled = true;
+
+        const token = localStorage.getItem('token');
+        const name = document.getElementById('name').value;
+        const description = document.getElementById('description').value;
+        const ott = document.getElementById('ott').value;
+        
+
+        const movie = { name, description, ott };
+
+        try {
+          const res = await fetch('/movies', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(movie)
+          });
+
+          const msgBox = document.getElementById('response-msg');
+
+          if (!res.ok) {
+            const error = await res.json();
+            msgBox.textContent = "Error: " + (error.detail || "Something went wrong.");
+            msgBox.className = "text-red-500 text-center mt-4";
+          } else {
+            const result = await res.json();
+            msgBox.textContent = `✅ Movie "${result.name}" submitted successfully!`;
+            msgBox.className = "text-green-400 text-center mt-4";
+            document.getElementById('movie-form').reset();
+          }
+        } catch (err) {
+          console.error(err);
+          document.getElementById('response-msg').textContent = "⚠️ Network or server error.";
+          document.getElementById('response-msg').className = "text-red-500 text-center mt-4";
+        }finally {
+      submitBtn.disabled = false; // 🔓 re-enable after response
+    }
+      });
+    </script>
+  {% endblock %}

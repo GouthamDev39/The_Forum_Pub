@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}User Detail{% endblock %}
+
+{% block content %}
+  <br>
+  <br>
+  <h1 class="text-4xl font-bold mb-8">User Details</h1>
+
+  <div id="user-detail" class="w-full max-w-2xl px-4">
+    <!-- Movie detail will appear here -->
+  </div>
+
+  <div class="space-x-4 mt-10">
+
+  <!-- <div id="movie-detail" class="grid h-56 grid-cols-3 flex flex-col content-stretch gap-4 justify-start"> -->
+  <div id="user-detail" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full px-4"></div>
+  <!-- Movie detail will appear here -->
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const params = new URLSearchParams(window.location.search);
+    const userId = params.get('id');
+    const token = localStorage.getItem('token');
+
+    if (!userId) {
+      document.getElementById("user-detail").innerHTML = "<p class='text-red-500'>Invalid user ID.</p>";
+    } else {
+      fetch(`/users/${userId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+      .then(res => {
+        if (!res.ok) throw new Error("User not found or unauthorized");
+        return res.json();
+      })
+      .then(user => {
+        const container = document.getElementById("user-detail");
+
+        // Generate movie links using movie_id
+        const movieLinksHTML = user.suggested_movies.map((movie, index) => `
+          <li class="mb-1">
+            <a href="/movies-id-ui?id=${user.movie_id[index]}" class="text-blue-400 hover:underline">
+              🎬 ${movie}
+            </a>
+          </li>
+        `).join("");
+
+        container.innerHTML = `
+          <div class="bg-gray-800 p-6 rounded-lg shadow-lg text-white">
+            <h2 class="text-3xl font-semibold mb-4">${user.username}</h2>
+            <p class="mb-2 font-semibold">Movies suggested by this user:</p>
+            <ul class="text-gray-300 list-none">
+              ${movieLinksHTML}
+            </ul>
+          </div>
+        `;
+      })
+      .catch(err => {
+        console.error("Error fetching user details", err);
+        document.getElementById("user-detail").innerHTML = "<p class='text-red-500'>Failed to load user details.</p>";
+      });
+    }
+</script>
+
+
+{% endblock %}

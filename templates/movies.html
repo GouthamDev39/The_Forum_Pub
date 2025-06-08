@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Movies{% endblock %}
+
+{% block content %}
+
+  <h1 class="text-4xl font-bold mt-6 py-2 md:py-2">🎬 The Movie Forum</h1>
+    
+  <div id="movie-list" class="w-full max-w-3xl space-y-4 px-4">
+    <!-- Movie cards will be inserted here -->
+  </div>
+  {% endblock %}
+
+{% block scripts %}
+  <script>
+    const token = localStorage.getItem('token'); // Get the token from local storage
+
+   // Fetch movies initially and display them
+      // Function to fetch and display movies
+function fetchMovies() {
+  fetch('/movies', {
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  })
+  .then(res => {
+    if (!res.ok) throw new Error("Unauthorized");
+    return res.json();
+  })
+  .then(movies => {
+    const container = document.getElementById("movie-list");
+
+    if (movies.length === 0) {
+      container.innerHTML = "<p class='text-center text-gray-400'>No movies found.</p>";
+      return;
+    }
+
+    // Dynamically generate movie cards
+    container.innerHTML = movies.map(movie => `
+      <div class="bg-gray-800 p-4 rounded-lg shadow-lg grid grid-cols-[1fr_auto] items-baseline-last">
+        <div>
+          <a href='/movies-id-ui?id=${movie.id}' class="text-xl font-semibold">${movie.name}</a>
+          <p class="text-gray-400">${movie.description || 'No description available.'}</p>
+          <p class="text-sm text-gray-500 mt-1">OTT Platform: ${movie.ott || 'N/A'}</p>
+          <p class="text-sm text-gray-500 mt-1">Credits: ${movie.credit || '0'} ⭐</p>
+          <button class="credit-button text-sm mt-2 p-2 rounded bg-blue-500 text-white"
+              data-movie-id="${movie.id}" 
+              data-credited="${movie.user_has_credited || false}">
+            ${movie.user_has_credited ? 'Uncredit' : 'Credit'}
+          </button>
+        </div>
+        <a href='/user-id-ui?id=${movie.owner?.id}' class="text-sm text-gray-500 mt-1">Suggested By: ${movie.suggested_by || 'Anonymous'}</a>
+        
+      </div>
+    
+    `).join("");
+      
+    // Adding click event listeners for the credit buttons
+    const buttons = document.querySelectorAll(".credit-button");
+
+    buttons.forEach(button => {
+      button.addEventListener("click", async (event) => {
+        const movieId = event.target.dataset.movieId;
+        const credited = event.target.dataset.credited === 'true';
+        const dir = credited ? 0 : 1; // 0 to revoke, 1 to credit
+
+        try {
+          const response = await fetch('/credit', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`,  // Use the token from localStorage
+            },
+            body: JSON.stringify({ movie_id: movieId, dir: dir })
+          });
+
+          if (!response.ok) {
+            throw new Error('Something went wrong while processing your request');
+          }
+
+          // After credit/uncredit action, re-fetch movies to update the UI
+          fetchMovies();  // Re-fetch movie list to show updated state
+          // alert(credited ? 'Credit revoked!' : 'Credit added!');
+        } catch (error) {
+          alert(`Error: ${error.message}`);
+        }
+      });
+    });
+  })
+  .catch(err => {
+    console.error("Failed to load movies", err);
+    window.location.href = '/login-ui'; // Redirect to login page if unauthorized
+  });
+}
+
+// Initial fetch when page loads
+fetchMovies();
+
+
+  </script>
+{% endblock %}

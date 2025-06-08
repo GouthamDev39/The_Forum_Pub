@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Movie Detail{% endblock %}</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.0/dist/tailwind.min.css" rel="stylesheet">
+
+  <link href="/static/css/styles.css" rel="stylesheet" />
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex flex-col items-center justify-start py-10">
+
+  <!-- Navbar -->
+ <nav class="w-full bg-gray-800 text-white py-1 px-3 flex items-center justify-between">
+  <a href="/my-page">
+    <div class="rounded bg-gray-700 text-center p-2 group items-center hover:bg-blue-600 transition-all duration-500 shadow-md">
+      <div class="text-gray-500">
+        <img class="h-13 w-25 object-fill" src="/static/images/lego.jpg" alt="girl with headphones">
+          <path
+            d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"
+            stroke-linejoin="round" stroke-linecap="round"></path>
+        </svg>
+      </div>
+    </div>
+  </a>
+
+  <a href="/movie-create-ui"
+    class="flex items-center px-6 py-6 bg-gradient-to-r from-blue-500 via-blue-600 to-blue-500 text-white font-bold text-sm rounded-full shadow-md hover:from-blue-600 hover:via-blue-700 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 active:bg-blue-800 active:shadow-inner transform hover:scale-105 transition duration-300 ease-in-out ml-3">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" fill="none"
+      class="w-6 h-6 mr-2 text-white">
+      <path d="M12 4v16m8-8H4" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></path>
+    </svg>
+    Suggest New
+  </a>
+
+  <div class="flex items-center space-x-2">
+    <a class="text-md px-2 py-1 rounded-full hover:bg-gray-700" href="/movies-ui">Home</a>
+    <a class="text-md px-2 py-1 rounded-full hover:text-red-400" href="/homepage">Exit</a>
+  </div>
+</nav>
+
+<br>
+  <!-- Page-specific content -->
+  {% block content %}{% endblock %}
+
+  <!-- Page-specific scripts -->
+  {% block scripts %}{% endblock %}
+<br>
+</body> 
+
+<footer class="mx-auto w-full max-w-container px-4 sm:px-6 lg:px-8">
+    <div class="border-t border-slate-900/5 py-10"><svg class="mx-auto h-5 w-auto text-slate-900" aria-hidden="true"
+            viewBox="0 0 160 24" fill="none">
+            
+        </svg>
+        <p class="mt-5 text-center text-sm leading-6 text-slate-500">© The Forum. All rights reserved.</p>
+    </div>
+</footer>
+
+
+</html>

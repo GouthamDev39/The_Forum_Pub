@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Movie Detail{% endblock %}
+
+{% block content %}
+  <h1 class="text-4xl font-bold mb-8">🎬 Movie Details</h1>
+
+  <div id="movie-detail" class="w-full max-w-2xl px-4">
+    <!-- Movie detail will appear here -->
+  </div>
+
+  <div class="space-x-4 mt-10">
+    
+  </div>
+{% endblock %}
+
+{% block scripts %}
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const movieId = params.get('id');
+    const token = localStorage.getItem('token');
+
+    if (!movieId) {
+      document.getElementById("movie-detail").innerHTML = "<p class='text-red-500'>Invalid movie ID.</p>";
+    } else {
+      fetch(`/movies/${movieId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+                
+      })
+      .then(res => {
+        if (!res.ok) throw new Error("Movie not found or unauthorized");
+        return res.json();
+      console.log(movieId);
+})
+      .then(movie => {
+        const container = document.getElementById("movie-detail");
+        container.innerHTML = `
+          <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+            <h2 class="text-3xl font-semibold mb-4">${movie.name}</h2>
+            <p class="text-gray-300 mb-2">${movie.description || 'No description available.'}</p>
+            <p class="text-sm text-gray-400 mb-1">OTT Platform: ${movie.ott || 'N/A'}</p>
+            <p class="text-sm text-gray-400 mb-1">Credits: ${movie.credit || '0'}</p>
+            <p class="text-sm text-gray-400 mt-4">Suggested By: ${movie.suggested_by || 'Anonymous'}</p>
+            <p class="text-sm text-gray-400 mt-4">This movie has been suggested : ${movie.suggested_times || 'Nil'} time(s)</p>
+            <a class="text-sm text-blue-400 mt-4 leading-none rounded-full hover:bg-gray-700" href="https://www.google.co.in/search?q=${movie.name || 'Nil'}%20movie" 
+                target="_blank" rel="noopener noreferrer">
+                    Click Here For mored details
+            </a>
+             
+          </div>
+          
+        `;
+      })
+      .catch(err => {
+        console.error("Error fetching movie details", err);
+        document.getElementById("movie-detail").innerHTML = "<p class='text-red-500'>Failed to load movie details.</p>";
+      });
+    }
+  </script>
+{% endblock %}
