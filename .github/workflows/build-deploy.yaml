@@ -1,7 +1,4 @@
-#CI/CD Pipeline
-#CI
 
-# .github/workflows/build-deploy.yml
 
 name: Build and test
 
@@ -61,5 +58,3 @@ jobs:
         run: |
           pytest -s -v --disable-warnings -x
           echo "Tested successfully"
-
-
